@@ -1,0 +1,62 @@
+<!DOCTYPE>
+<html>
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+<script src="http://code.jquery.com/jquery-1.11.0.min.js"></script>
+<title>Websocket Chat</title>
+<style>
+li{
+  clear: both;
+  border: 1px solid #666666;
+  padding: 0.5em;
+  width: 200px;
+  margin-top: 5px;
+  border-radius:10px;
+  -webkit-border-radius:10px;
+}
+li.send{
+  float: left;
+}
+li.recv{
+  float: right;
+}
+</style>
+</head>
+<script type="text/javascript">
+function client_start(){
+  // ① WebSocket 열기
+  var sock = new WebSocket('ws://' + window.location.hostname + ':8888');
+  // ② 메시지 수신 처리
+  sock.onmessage = function(e){
+    var msg = JSON.parse(e.data);
+    var $li = $('<li></li>').addClass(msg.type).text(msg.message);
+    $('ol#list').append($li);
+  }
+  return sock;
+};
+
+$(function(){
+	var sock = client_start();
+	$('button#send').click(function(){
+		var message = $('input#msg').val();
+		if(message){
+			// ③ 메시지 송신 처리
+			sock.send(message);
+			$('input#msg').val("");
+		}
+	});
+});
+</script>
+<body>
+<div>
+  <input id="msg" type="text" name="message" value="">
+  <button id="send">보내기</button>
+  <hr />
+  <div>
+    <!-- 아래에 메시지 표시 -->
+    <ol id="list">
+    </ol>
+  </div>
+</div>
+</body>
+</html>
